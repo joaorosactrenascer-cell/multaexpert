@@ -8,6 +8,7 @@ type AuthContextType = {
     session: Session | null;
     loading: boolean;
     signIn: (email: string, password: string) => Promise<{ error?: string }>;
+    signUp: (email: string, password: string, displayName: string) => Promise<{ error?: string }>;
     signOut: () => Promise<void>;
 };
 
@@ -76,6 +77,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const signUp = async (email: string, password: string, displayName: string) => {
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        full_name: displayName,
+                    }
+                }
+            });
+            
+            if (error) return { error: error.message };
+            return {};
+        } catch (err: any) {
+            return { error: err.message || "Erro inesperado ao criar conta" };
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const signOut = async () => {
         try {
             await supabase.auth.signOut();
@@ -91,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 session,
                 loading,
                 signIn,
+                signUp,
                 signOut,
             }}
         >
