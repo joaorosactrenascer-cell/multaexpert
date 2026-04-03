@@ -42,15 +42,15 @@ export default function Login() {
             {/* ESQUERDA */}
             <div className="hidden lg:flex w-1/2 bg-slate-900 text-white p-10 flex-col justify-between">
                 <div>
-                   <div className="flex items-center gap-2 mb-8">
-                        <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-bold text-xl">M</div>
-                        <h1 className="text-2xl font-bold tracking-tight">MultaExpert <span className="text-blue-500">IA</span></h1>
+                   <div className="flex items-center gap-3 mb-8">
+                        <img src="/logo.png" alt="MultaExpert Logo" className="h-12 w-auto" />
+                        <h1 className="text-xl font-bold tracking-tight uppercase">MultaExpert</h1>
                    </div>
 
                     <div className="mt-20">
                         <h2 className="text-4xl font-bold leading-tight">
                             Defesas de multas <br />
-                            <span className="text-blue-500">inteligentes e rápidas.</span>
+                            <span style={{ color: "#0B2F5E" }} className="dark:text-blue-400">inteligentes e rápidas.</span>
                         </h2>
                         <p className="text-slate-400 mt-6 text-lg max-w-md">
                             A plataforma definitiva para especialistas em trânsito automatizarem seus processos com o poder da Inteligência Artificial.
