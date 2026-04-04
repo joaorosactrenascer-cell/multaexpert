@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light dark;
+  --color-brand-blue: #0056b3;
+  --color-brand-green: #28a745;
 }
 
 html {
@@ -11,51 +12,15 @@ html {
 }
 
 body {
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  @apply antialiased text-slate-900 bg-white dark:text-slate-100 dark:bg-zinc-950 transition-colors duration-300;
 }
 
-/* Custom Gradients */
-.bg-gradient-radial {
-  background-image: radial-gradient(var(--tw-gradient-stops));
+*,
+*::before,
+*::after {
+  @apply transition-colors duration-300;
 }
 
-/* Glass effect for light/dark */
-.glass {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.dark .glass {
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+.btn-whatsapp {
+  @apply bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-lg;
 }

@@ -1,332 +1,571 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Shield, 
-  Zap, 
-  CheckCircle, 
-  ArrowRight, 
-  Users, 
-  FileText, 
-  Check,
-  MessageCircle,
-  Clock,
-  ExternalLink,
-  MapPin,
-  Mail,
-  Phone,
-  HelpCircle,
-  AlertTriangle,
-  Sun,
-  Moon,
-  ChevronRight
-} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Sun, Moon, Menu, X, MessageCircle, AlertTriangle, CheckCircle, Search, FileText, Send, Clock, ShieldCheck, Ban, AlertCircle, RefreshCw, ChevronRight, Car } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-const WHATSAPP_LINK = "https://wa.me/5548991003589?text=Olá,%20recebi%20uma%20multa%20e%20quero%20saber%20se%20posso%20recorrer.";
-
-// Cores extraídas da logo
-const COLORS = {
-  primaryBlue: "#0B2F5E",
-  secondaryGreen: "#598B2C",
-};
-
 export default function App() {
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('theme');
-    return saved ? saved === 'dark' : false;
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      if (saved) return saved === 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
   });
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+
   useEffect(() => {
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    if (isDark) {
+    if (isDarkMode) {
       document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
-  }, [isDark]);
+  }, [isDarkMode]);
 
-  const toggleTheme = () => setIsDark(!isDark);
+  useEffect(() => {
+    const hasSeenPopup = sessionStorage.getItem('hasSeenPopup');
+    if (!hasSeenPopup) {
+      const timer = setTimeout(() => setShowPopup(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const closePopup = () => {
+    setShowPopup(false);
+    sessionStorage.setItem('hasSeenPopup', 'true');
+  };
+
+  const whatsappLink = "https://wa.me/5548991003589?text=Olá! Fui multado e quero saber se consigo recorrer.";
+
+
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 font-sans selection:bg-blue-500/30 ${isDark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900'}`}>
-      
-      {/* WA BUTTON FIXED */}
-      <a 
-        href={WHATSAPP_LINK}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-[100] bg-green-500 hover:bg-green-600 p-4 rounded-full shadow-2xl transition-all hover:scale-110 flex items-center justify-center group active:scale-95"
-        aria-label="Falar no WhatsApp"
-      >
-        <MessageCircle size={32} className="text-white fill-white group-hover:rotate-12 transition-transform" />
-      </a>
-
-      {/* NAVBAR */}
-      <nav className={`fixed top-0 w-full z-50 border-b backdrop-blur-md transition-all ${isDark ? 'bg-slate-950/80 border-slate-800/50' : 'bg-white/80 border-slate-200'}`}>
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-             <img src="/logo.png" alt="MultaExpert Logo" className="h-12 w-auto" />
-             <div className="h-8 w-px bg-slate-300 dark:bg-slate-800 hidden sm:block"></div>
-             <span className="text-lg font-bold tracking-tighter uppercase hidden sm:block">
-               Multa<span style={{ color: COLORS.secondaryGreen }}>Expert</span>
-             </span>
-          </div>
-
-          <div className="flex items-center gap-4 sm:gap-8">
-            <button 
-              onClick={toggleTheme}
-              className={`p-2 rounded-xl border transition-all ${isDark ? 'border-slate-800 bg-slate-900 text-yellow-400' : 'border-slate-200 bg-slate-50 text-slate-600'}`}
-              aria-label="Alternar Tema"
+    <div className="min-h-screen font-sans selection:bg-brand-blue selection:text-white">
+      {/* Popup Inicial */}
+      <AnimatePresence>
+        {showPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden relative border border-slate-200 dark:border-zinc-800"
             >
-              {isDark ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-            <a 
-              href={WHATSAPP_LINK} 
-              className="bg-green-600 hover:bg-green-700 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all flex items-center gap-2 shadow-lg shadow-green-600/20 active:scale-95"
-            >
-              Consultar <span className="hidden sm:inline">Grátis</span> <MessageCircle size={18} />
-            </a>
+              <button
+                onClick={closePopup}
+                className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors z-10"
+              >
+                <X size={24} />
+              </button>
+
+              <div className="p-10">
+                <div className="flex justify-center mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                    <AlertTriangle size={32} />
+                  </div>
+                </div>
+
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 text-center">
+                  Aviso Importante
+                </h3>
+
+                <p className="text-slate-600 dark:text-slate-400 mb-8 text-center leading-relaxed">
+                  A MultaExpert não realiza trâmites por advogados. Todos os processos são feitos pela nossa equipe oficial de especialistas administrativos.
+                </p>
+
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6 mb-8 text-center border border-blue-100 dark:border-blue-800">
+                  <p className="text-brand-blue dark:text-blue-300 font-bold text-lg">
+                    Recebeu uma multa? Você pode não precisar pagar!
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <a
+                    href={whatsappLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-whatsapp w-full py-5 text-lg shadow-xl shadow-green-500/20"
+                    onClick={closePopup}
+                  >
+                    ANALISAR MINHA MULTA
+                  </a>
+                  <button
+                    onClick={closePopup}
+                    className="w-full text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-slate-800 dark:hover:text-white transition-colors"
+                  >
+                    Continuar para o site
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-zinc-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-20 items-center">
+            <div className="flex-shrink-0 flex items-center">
+              <a href="#" className="text-2xl font-black text-brand-blue dark:text-blue-400 tracking-tighter flex items-center gap-2">
+                <ShieldCheck size={32} />
+                <span>Multa<span className="text-slate-900 dark:text-white">Expert</span></span>
+              </a>
+            </div>
+
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#inicio" className="text-slate-600 dark:text-slate-300 hover:text-brand-blue dark:hover:text-blue-400 font-medium transition-colors">Início</a>
+              <a href="#como-funciona" className="text-slate-600 dark:text-slate-300 hover:text-brand-blue dark:hover:text-blue-400 font-medium transition-colors">Como Funciona</a>
+              <a href="#servicos" className="text-slate-600 dark:text-slate-300 hover:text-brand-blue dark:hover:text-blue-400 font-medium transition-colors">Serviços</a>
+              <a href="#duvidas" className="text-slate-600 dark:text-slate-300 hover:text-brand-blue dark:hover:text-blue-400 font-medium transition-colors">Dúvidas</a>
+              <a href="#contato" className="text-slate-600 dark:text-slate-300 hover:text-brand-blue dark:hover:text-blue-400 font-medium transition-colors">Contato</a>
+
+              <div className="flex items-center gap-4 pl-4 border-l border-slate-200 dark:border-zinc-800">
+                <button
+                  onClick={() => setIsDarkMode(!isDarkMode)}
+                  className="p-2.5 rounded-xl bg-slate-100 dark:bg-zinc-900 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-800 transition-all"
+                  aria-label="Alternar tema"
+                >
+                  {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
+                </button>
+                <a href={whatsappLink} className="bg-brand-blue hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/20">
+                  CONSULTA GRÁTIS
+                </a>
+              </div>
+            </div>
+
+            <div className="md:hidden flex items-center gap-3">
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="p-2 rounded-xl bg-slate-100 dark:bg-zinc-900 text-slate-600 dark:text-slate-300"
+              >
+                {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
+              </button>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-900"
+              >
+                {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="md:hidden bg-white dark:bg-zinc-950 border-b border-slate-200 dark:border-zinc-800 overflow-hidden"
+            >
+              <div className="px-4 pt-2 pb-8 space-y-1">
+                <a href="#inicio" onClick={() => setIsMenuOpen(false)} className="block px-4 py-4 text-lg font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-zinc-900 rounded-xl">Início</a>
+                <a href="#como-funciona" onClick={() => setIsMenuOpen(false)} className="block px-4 py-4 text-lg font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-zinc-900 rounded-xl">Como Funciona</a>
+                <a href="#servicos" onClick={() => setIsMenuOpen(false)} className="block px-4 py-4 text-lg font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-zinc-900 rounded-xl">Serviços</a>
+                <a href="#duvidas" onClick={() => setIsMenuOpen(false)} className="block px-4 py-4 text-lg font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-zinc-900 rounded-xl">Dúvidas</a>
+                <a href="#contato" onClick={() => setIsMenuOpen(false)} className="block px-4 py-4 text-lg font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-zinc-900 rounded-xl">Contato</a>
+                <div className="pt-6 px-4">
+                  <a href={whatsappLink} className="btn-whatsapp w-full py-4">
+                    <MessageCircle size={20} />
+                    Falar no WhatsApp
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
-      <main>
-        {/* HERO */}
-        <section className="relative pt-44 pb-20 overflow-hidden">
-          {/* Background Elements */}
-          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[600px] h-[600px] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none"></div>
-          
-          <div className="max-w-5xl mx-auto px-6 text-center relative z-10">
+      {/* Hero Section */}
+      <section id="inicio" className="relative pt-32 pb-20 lg:pt-52 lg:pb-40 overflow-hidden">
+        {/* Background Accents */}
+        <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[600px] h-[600px] bg-brand-blue/5 dark:bg-blue-400/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[400px] h-[400px] bg-brand-green/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ duration: 0.6 }}
+              className="text-center lg:text-left mb-16 lg:mb-0"
             >
-              <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-8 leading-[1]">
-                Recebeu uma multa? <br />
-                <span style={{ color: COLORS.primaryBlue }} className="dark:text-blue-400">Você pode não precisar pagar.</span>
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-brand-blue dark:text-blue-300 text-sm font-bold mb-8 shadow-sm">
+                <CheckCircle size={16} className="text-brand-green" />
+                <span>+20.000 motoristas ajudados em todo o Brasil</span>
+              </div>
+
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white leading-[1.1] mb-8 tracking-tight">
+                🚨 Foi multado? Você <span className="text-brand-blue dark:text-blue-400 relative">
+                  pode não precisar pagar!
+                  <svg className="absolute -bottom-2 left-0 w-full h-3 text-brand-green/30" viewBox="0 0 100 10" preserveAspectRatio="none">
+                    <path d="M0 5 Q 25 0, 50 5 T 100 5" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
+                  </svg>
+                </span>
               </h1>
-              <p className={`text-lg md:text-2xl max-w-2xl mx-auto mb-10 leading-relaxed font-semibold transition-colors ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Descubra agora se sua multa pode ser cancelada. Análise rápida, técnica e gratuita pelo WhatsApp.
+
+              <p className="text-lg md:text-2xl text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium">
+                Descubra gratuitamente suas chances de sucesso. Nossa equipe jurídica analisa seu caso e monta a melhor estratégia de defesa.
               </p>
 
-              <div className="flex flex-col items-center justify-center gap-6">
-                <a 
-                  href={WHATSAPP_LINK}
-                  className="w-full sm:w-auto bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 px-12 py-5 rounded-2xl text-xl font-black text-white transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 group shadow-blue-700/20"
-                >
-                  QUERO ANALISAR MINHA MULTA <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+              <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
+                <a href={whatsappLink} className="btn-whatsapp text-xl px-12 py-5 shadow-2xl shadow-green-500/30">
+                  Receber Consulta Gratuita
                 </a>
+              </div>
+
+              <div className="mt-10 flex items-center justify-center lg:justify-start gap-6 text-slate-400 dark:text-zinc-500">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck size={20} />
+                  <span className="text-sm font-semibold">100% Seguro</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock size={20} />
+                  <span className="text-sm font-semibold">Análise em 15min</span>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              <div className="relative rounded-[2.5rem] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.15)] dark:shadow-none border-8 border-white dark:border-zinc-900">
+                <img
+                  src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=1000"
+                  alt="Especialista MultaExpert analisando documentos"
+                  className="w-full object-cover aspect-[4/5] lg:aspect-square"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <div className="absolute bottom-8 left-8 right-8">
+                  <div className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl">
+                    <div className="flex items-center gap-4">
+                      <div className="flex -space-x-3">
+                        {[1, 2, 3, 4].map(i => (
+                          <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-200 overflow-hidden">
+                            <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="Avatar" referrerPolicy="no-referrer" />
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-white text-sm font-bold">
+                        Junte-se a milhares de motoristas satisfeitos
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* BLOCO DE URGÊNCIA */}
-        <section className={`py-4 transition-colors ${isDark ? 'bg-red-950/30' : 'bg-red-50'}`}>
-          <div className="max-w-7xl mx-auto px-6 text-center">
-             <p className="text-red-600 dark:text-red-400 font-black uppercase tracking-widest text-sm flex items-center justify-center gap-2">
-                <Clock size={16} /> O prazo para recorrer é limitado. Quanto antes agir, maiores as chances.
-             </p>
-          </div>
-        </section>
-
-        {/* PROBLEMA / SOLUÇÃO */}
-        <section className="py-24">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-               <div>
-                  <h2 className="text-4xl font-black mb-8 italic uppercase tracking-tighter">Muitas multas são aplicadas <span className="text-red-600 italic">com erro</span>.</h2>
-                  <p className={`text-lg mb-8 leading-relaxed font-medium transition-colors ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    Pagou a multa sem nem ler? Você pode ter perdido dinheiro. Órgãos autuadores cometem erros formais constantemente: radares sem aferição, sinalização incorreta ou erros no preenchimento do auto.
-                  </p>
-                  <p className={`text-lg mb-8 leading-relaxed font-medium transition-colors ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    A MultaExpert analisa cada detalhe técnico para garantir que você não seja punido injustamente.
-                  </p>
-               </div>
-               <div className={`p-10 rounded-[3rem] border transition-all ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                  <h3 className="text-2xl font-black mb-6 uppercase tracking-tight">Cuidamos de tudo para você:</h3>
-                  <div className="space-y-6">
-                     <FeatureItem text="Análise detalhada do Auto de Infração" isDark={isDark} />
-                     <FeatureItem text="Busca por falhas na sinalização ou no radar" isDark={isDark} />
-                     <FeatureItem text="Protocolo e acompanhamento do recurso" isDark={isDark} />
-                     <FeatureItem text="Defesa fundamentada no CTB e Resoluções" isDark={isDark} />
-                  </div>
-               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* COMO FUNCIONA */}
-        <section id="como-funciona" className={`py-32 transition-colors ${isDark ? 'bg-slate-900/40' : 'bg-blue-50/40'}`}>
-          <div className="max-w-7xl mx-auto px-6 text-center mb-20">
-             <h2 className="text-4xl md:text-5xl font-black mb-6 italic uppercase tracking-tighter">Seu Recurso em 4 Etapas.</h2>
+      {/* Como Funciona */}
+      <section id="como-funciona" className="py-32 bg-slate-50 dark:bg-zinc-900/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">Como Funciona?</h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-medium">
+              Simplificamos a burocracia para você. Nosso processo é 100% digital e transparente.
+            </p>
           </div>
 
-          <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 relative">
-             <Step 
-                number="01"
-                title="Fale Conosco"
-                description="Clique no botão e envie sua multa pelo WhatsApp."
-                icon={MessageCircle}
-                isDark={isDark}
-             />
-             <Step 
-                number="02"
-                title="Análise IA"
-                description="Nossos especialistas analisam viabilidade sem compromisso."
-                icon={Zap}
-                isDark={isDark}
-             />
-             <Step 
-                number="03"
-                title="Defesa"
-                description="Montamos o recurso jurídico totalmente fundamentado."
-                icon={Shield}
-                isDark={isDark}
-             />
-             <Step 
-                number="04"
-                title="Decisão"
-                description="Acompanhamos o julgamento até a decisão final."
-                icon={CheckCircle}
-                isDark={isDark}
-             />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+            {[
+              { icon: <MessageCircle size={32} />, title: "Enviar", desc: "Envie sua multa pelo WhatsApp em segundos. Sem formulários chatos.", color: "bg-green-500" },
+              { icon: <Search size={32} />, title: "Analisar", desc: "Nossa equipe técnica analisa as chances reais de vitória do seu caso.", color: "bg-blue-500" },
+              { icon: <FileText size={32} />, title: "Preparar", desc: "Montamos sua defesa técnica com base na legislação vigente e jurisprudência.", color: "bg-purple-500" },
+              { icon: <Send size={32} />, title: "Enviar", desc: "Protocolamos o recurso nos órgãos competentes (DETRAN, PRF, etc).", color: "bg-orange-500" },
+              { icon: <Clock size={32} />, title: "Acompanhar", desc: "Monitoramos o andamento do processo e te mantemos informado de tudo.", color: "bg-indigo-500" },
+              { icon: <CheckCircle size={32} />, title: "Finalizar", desc: "Resultado entregue e orientação completa sobre sua situação.", color: "bg-brand-green" },
+            ].map((item, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                className="bg-white dark:bg-zinc-900 p-10 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-zinc-800 group hover:border-brand-blue/30 transition-all"
+              >
+                <div className={`w-16 h-16 rounded-2xl ${item.color} text-white flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-lg`}>
+                  {item.icon}
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">{item.title}</h3>
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">{item.desc}</p>
+              </motion.div>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* BENEFICIOS / PROVA */}
-        <section id="beneficios" className="py-32 border-t border-slate-100 dark:border-slate-900">
-           <div className="max-w-7xl mx-auto px-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-start">
-                 <div className="lg:col-span-2">
-                    <h2 className="text-4xl font-black mb-12 italic uppercase tracking-tighter underline decoration-blue-600 decoration-8 underline-offset-8">Por que escolher especialistas?</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                       <Benefit icon={Users} title="Atendimento Humano" desc="Suporte direto, sem robôs travados." isDark={isDark} />
-                       <Benefit icon={Shield} title="Garantia de Técnica" desc="Base jurídica atualizada com o CTB." isDark={isDark} />
-                       <Benefit icon={CheckCircle} title="Mais de 5.000 Casos" desc="Experiência comprovada em todo Brasil." isDark={isDark} />
-                       <Benefit icon={Clock} title="Rapidez" desc="Análise em minutos via WhatsApp." isDark={isDark} />
-                    </div>
-                 </div>
-                 <div className={`p-10 rounded-[2.5rem] transition-all sticky top-28 ${isDark ? 'bg-slate-900 border border-slate-800' : 'bg-white shadow-2xl border border-slate-100'}`}>
-                    <div className="text-blue-600 mb-6 font-black text-xs uppercase tracking-widest">Confiança MultaExpert</div>
-                    <p className={`text-xl font-bold italic mb-8 leading-relaxed ${isDark ? 'text-white' : 'text-slate-800'}`}>
-                       "Nossa missão não é apenas recorrer, é garantir que o processo legal de trânsito seja seguido com rigor técnico."
-                    </p>
-                    <div className="flex items-center gap-4">
-                       <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl uppercase">ME</div>
-                       <div>
-                          <p className="font-black text-sm uppercase">Equipe Jurídica</p>
-                          <p className="text-slate-500 text-xs font-bold uppercase">MultaExpert Especialistas</p>
-                       </div>
-                    </div>
-                 </div>
-              </div>
-           </div>
-        </section>
-
-        {/* CTA FINAL */}
-        <section className="py-32">
-          <div className="max-w-5xl mx-auto px-6">
-             <div style={{ backgroundColor: COLORS.primaryBlue }} className="rounded-[3rem] p-12 md:p-20 text-center text-white shadow-2xl transition-transform hover:scale-[1.01]">
-                <h2 className="text-4xl md:text-6xl font-black mb-8 italic uppercase tracking-tighter">Não perca dinheiro com multa injusta.</h2>
-                <p className="text-blue-100 text-lg md:text-xl mb-12 font-bold max-w-xl mx-auto opacity-90">
-                   Muitas vezes o valor da multa é o de menos. A pontuação pode tirar seu sustento. Recorra hoje!
-                </p>
-                <a 
-                  href={WHATSAPP_LINK}
-                  className="bg-white hover:scale-105 px-12 py-6 rounded-3xl text-2xl font-black transition-all shadow-xl inline-flex items-center gap-4 active:scale-95 group"
-                >
-                  <span style={{ color: COLORS.primaryBlue }}>ANÁLISE GRÁTIS POR WHATSAPP</span> 
-                  <MessageCircle size={28} className="text-green-600" />
-                </a>
-             </div>
-          </div>
-        </section>
-      </main>
-
-      {/* FOOTER */}
-      <footer className={`py-20 border-t transition-colors ${isDark ? 'bg-slate-950 border-slate-900' : 'bg-slate-50 border-slate-200'}`}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-20 text-center md:text-left">
-            <div className="col-span-1">
-              <img src="/logo.png" alt="Logo" className="h-16 w-auto mx-auto md:mx-0 mb-8" />
-              <p className={`font-semibold italic transition-colors ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
-                Tecnologia e perícia em defesa de trânsito.
+      {/* Serviços */}
+      <section id="servicos" className="py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">Nossas Especialidades</h2>
+              <p className="text-lg text-slate-600 dark:text-slate-400 font-medium">
+                Cobertura completa para qualquer tipo de infração ou problema com sua Carteira Nacional de Habilitação.
               </p>
             </div>
-            
+            <a href={whatsappLink} className="text-brand-blue dark:text-blue-400 font-bold flex items-center gap-2 hover:gap-3 transition-all group">
+              Ver todos os serviços <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            </a>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { icon: <Car size={40} />, title: "Recurso de Multas", desc: "Recebeu uma multa e acha que foi injusta? Analisamos seu caso e buscamos a melhor forma de recorrer.", tag: "Novo" },
+              { icon: <Ban size={40} />, title: "CNH Suspensa", desc: "Atingiu o limite de pontos? Revertemos a suspensão para você não parar de dirigir.", tag: "Mais Procurado" },
+              { icon: <AlertCircle size={40} />, title: "CNH Cassada", desc: "Tratamento jurídico rigoroso para processos de cassação de direito de dirigir.", tag: "Urgente" },
+              { icon: <ShieldCheck size={40} />, title: "CNH Bloqueada", desc: "Desbloqueio rápido para problemas no prontuário ou divergências de dados.", tag: "Rápido" },
+              { icon: <AlertTriangle size={40} />, title: "Lei Seca (Bafômetro)", desc: "Recursos especializados para bafômetro e recusa, com foco em falhas técnicas.", tag: "Especializado" },
+              { icon: <RefreshCw size={40} />, title: "Renovação de CNH", desc: "Assessoria completa para renovação simples ou com EAR, mesmo vencida há muito tempo.", tag: "Prático" },
+            ].map((service, idx) => (
+              <motion.div
+                key={idx}
+                whileHover={{ y: -10 }}
+                className="bg-white dark:bg-zinc-900 p-10 rounded-[2.5rem] border border-slate-200 dark:border-zinc-800 flex flex-col h-full shadow-sm hover:shadow-2xl hover:shadow-brand-blue/5 transition-all relative overflow-hidden group"
+              >
+                {service.tag && (
+                  <div className="absolute top-6 right-6 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-brand-blue dark:text-blue-300 text-[10px] font-black uppercase tracking-widest">
+                    {service.tag}
+                  </div>
+                )}
+                <div className="text-brand-blue dark:text-blue-400 mb-8 group-hover:scale-110 transition-transform origin-left">
+                  {service.icon}
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">{service.title}</h3>
+                <p className="text-slate-600 dark:text-slate-400 mb-10 flex-grow leading-relaxed font-medium">{service.desc}</p>
+                <a href={whatsappLink} className="btn-whatsapp w-full py-4 text-base">
+                  Saiba mais
+                </a>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="duvidas" className="py-32 bg-slate-50 dark:bg-zinc-900/30">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">Dúvidas Frequentes</h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-medium">
+              Tudo o que você precisa saber para recuperar sua tranquilidade no trânsito.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <FaqItem
+              question="Como falar com a MultaExpert?"
+              answer="Você pode entrar em contato conosco clicando em qualquer botão de WhatsApp neste site. Nosso atendimento é imediato e funciona em horário comercial estendido."
+            />
+            <FaqItem
+              question="O que preciso enviar para análise?"
+              answer="Basta enviar uma foto da notificação da multa ou o número da placa e RENAVAM. Nossa análise inicial é gratuita e serve para identificar nulidades no auto de infração."
+            />
+            <FaqItem
+              question="Quando os pontos saem do meu prontuário?"
+              answer="Os pontos saem do prontuário assim que o recurso é deferido (ganho). Enquanto o recurso está em julgamento, os pontos ficam suspensos e não te impedem de dirigir."
+            />
+            <FaqItem
+              question="Posso dirigir enquanto o recurso está em andamento?"
+              answer="Sim! O recurso administrativo garante o efeito suspensivo da penalidade. Isso significa que você mantém seu direito de dirigir normalmente até a decisão final."
+            />
+            <FaqItem
+              question="CNH suspensa tem solução?"
+              answer="Com certeza. A maioria dos processos de suspensão possui falhas administrativas que podem ser exploradas para anular a penalidade. Analisamos cada detalhe do processo."
+            />
+            <FaqItem
+              question="Recusar o bafômetro gera multa mesmo sem beber?"
+              answer="Sim, a recusa é considerada uma infração gravíssima pelo CTB. No entanto, existem protocolos rígidos que os agentes devem seguir, e falhas nesses protocolos são comuns e anulam a multa."
+            />
+            <FaqItem
+              question="Quanto tempo demora o processo de recurso?"
+              answer="O tempo varia conforme o órgão julgador, mas geralmente leva de 3 a 12 meses. O importante é que durante todo esse tempo você continua com sua CNH regularizada."
+            />
+            <FaqItem
+              question="E se o recurso for negado em primeira instância?"
+              answer="Ainda temos a segunda instância (CETRAN). Muitos casos que são negados na JARI são ganhos no conselho estadual, onde a análise costuma ser mais técnica e rigorosa."
+            />
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-20 p-10 bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-slate-200 dark:border-zinc-800 text-center shadow-xl shadow-slate-200/50 dark:shadow-none"
+          >
+            <h4 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Ainda com dúvidas?</h4>
+            <p className="text-slate-600 dark:text-slate-400 mb-8 font-medium">Nossos consultores estão online agora para te ajudar.</p>
+            <a href={whatsappLink} className="btn-whatsapp inline-flex px-12 py-5 text-lg">
+              Fale no WhatsApp agora
+            </a>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CTA Final */}
+      <section className="py-32 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="bg-brand-blue rounded-[3.5rem] p-12 md:p-24 text-center relative overflow-hidden shadow-2xl shadow-brand-blue/30">
+            {/* Decorative circles */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-green/20 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
+
+            <div className="relative z-10">
+              <h2 className="text-4xl md:text-7xl font-black text-white mb-10 tracking-tight leading-tight">
+                Não perca dinheiro com <br className="hidden md:block" /> <span className="text-blue-200">multa injusta</span>
+              </h2>
+              <p className="text-xl md:text-2xl text-blue-100 mb-16 max-w-2xl mx-auto font-medium">
+                Proteja seu bolso e sua carteira de motorista. Comece sua análise gratuita agora mesmo.
+              </p>
+              <a href={whatsappLink} className="bg-white text-brand-blue hover:bg-slate-100 font-black py-6 px-16 rounded-2xl text-2xl transition-all transform hover:scale-105 active:scale-95 shadow-2xl inline-flex items-center gap-4">
+                FAZER ANÁLISE GRATUITA
+                <MessageCircle size={28} />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer id="contato" className="bg-slate-950 text-white pt-32 pb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-16 mb-24">
+            <div className="col-span-1 md:col-span-2">
+              <a href="#" className="text-3xl font-black text-blue-400 tracking-tighter mb-8 block flex items-center gap-2">
+                <ShieldCheck size={36} />
+                <span>Multa<span className="text-white">Expert</span></span>
+              </a>
+              <p className="text-slate-400 max-w-md leading-relaxed text-lg font-medium mb-10">
+                Líderes em recursos de multas e regularização de CNH. Combinamos tecnologia e conhecimento jurídico para garantir seus direitos no trânsito.
+              </p>
+              <div className="flex gap-4">
+                {['facebook', 'instagram', 'linkedin'].map(social => (
+                  <a key={social} href="#" className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center hover:bg-brand-blue transition-colors border border-white/10">
+                    <span className="sr-only">{social}</span>
+                    <div className="w-5 h-5 bg-slate-400 rounded-sm"></div>
+                  </a>
+                ))}
+              </div>
+            </div>
+
             <div>
-              <h4 className="font-black text-xl mb-8 uppercase italic transition-colors">Atendimento</h4>
-              <ul className={`space-y-4 font-bold transition-colors ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                <li className="flex items-center justify-center md:justify-start gap-4">
-                   <Phone size={18} style={{ color: COLORS.primaryBlue }} /> (48) 99100-3589
+              <h4 className="text-xl font-bold mb-8">Contato</h4>
+              <ul className="space-y-6 text-slate-400 font-medium">
+                <li className="flex items-start gap-4">
+                  <MessageCircle size={24} className="text-brand-green shrink-0" />
+                  <div>
+                    <p className="text-white font-bold mb-1">WhatsApp</p>
+                    <p>(00) 00000-0000</p>
+                  </div>
                 </li>
-                <li className="flex items-center justify-center md:justify-start gap-4">
-                   <Mail size={18} style={{ color: COLORS.primaryBlue }} /> multaexpert01@gmail.com
+                <li className="flex items-start gap-4">
+                  <FileText size={24} className="text-brand-blue shrink-0" />
+                  <div>
+                    <p className="text-white font-bold mb-1">E-mail</p>
+                    <p>contato@multaexpert.com.br</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-4">
+                  <AlertCircle size={24} className="text-slate-500 shrink-0" />
+                  <div>
+                    <p className="text-white font-bold mb-1">Endereço</p>
+                    <p>Av. Paulista, 1000 - Bela Vista<br />São Paulo - SP, 01310-100</p>
+                  </div>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-black text-xl mb-8 uppercase italic transition-colors">Onde Estamos</h4>
-              <div className={`flex items-start justify-center md:justify-start gap-4 font-bold transition-colors ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                 <MapPin size={24} style={{ color: COLORS.primaryBlue }} className="mt-1 shrink-0" />
-                 <p className="leading-relaxed">
-                    Rua José Ferreira, 101 sala 4 <br />
-                    Centro, Tubarão - SC
-                 </p>
-              </div>
+              <h4 className="text-xl font-bold mb-8">Links Rápidos</h4>
+              <ul className="space-y-4 text-slate-400 font-medium">
+                <li><a href="#inicio" className="hover:text-white transition-colors flex items-center gap-2"><ChevronRight size={16} /> Início</a></li>
+                <li><a href="#como-funciona" className="hover:text-white transition-colors flex items-center gap-2"><ChevronRight size={16} /> Como Funciona</a></li>
+                <li><a href="#servicos" className="hover:text-white transition-colors flex items-center gap-2"><ChevronRight size={16} /> Serviços</a></li>
+                <li><a href="#duvidas" className="hover:text-white transition-colors flex items-center gap-2"><ChevronRight size={16} /> Dúvidas</a></li>
+                <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2"><ChevronRight size={16} /> Termos de Uso</a></li>
+              </ul>
             </div>
           </div>
 
-          <div className={`flex flex-col md:flex-row items-center justify-between pt-12 border-t text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${isDark ? 'border-slate-900 text-slate-700' : 'border-slate-200 text-slate-400'}`}>
-            <p>© {new Date().getFullYear()} MultaExpert IA. Todos os direitos reservados.</p>
-            <div className="flex gap-8 mt-6 md:mt-0">
-               <span>Defesa de Multas com Especialistas</span>
+          <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-slate-500 text-sm font-medium">
+            <p>© {new Date().getFullYear()} MultaExpert. Todos os direitos reservados.</p>
+            <div className="flex gap-8">
+              <a href="#" className="hover:text-white transition-colors">Política de Privacidade</a>
+              <a href="#" className="hover:text-white transition-colors">Segurança</a>
             </div>
           </div>
         </div>
       </footer>
+
+      {/* Floating WhatsApp Button */}
+      <motion.a
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 2, type: 'spring' }}
+        href={whatsappLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-8 right-8 z-40 bg-brand-green text-white p-5 rounded-[2rem] shadow-[0_20px_40px_rgba(40,167,69,0.3)] hover:scale-110 active:scale-95 transition-all group"
+      >
+        <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-white dark:bg-zinc-900 text-slate-900 dark:text-white px-4 py-2 rounded-xl text-sm font-bold shadow-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-slate-100 dark:border-zinc-800">
+          Análise Gratuita Agora!
+        </div>
+        <MessageCircle size={32} />
+      </motion.a>
     </div>
   );
 }
 
-function FeatureItem({ text, isDark }: { text: string, isDark: boolean }) {
-  return (
-    <div className="flex items-center gap-4 group">
-      <div className="w-6 h-6 bg-green-500 flex items-center justify-center rounded-full shadow-lg shadow-green-500/20 group-hover:scale-110 transition-transform">
-        <Check size={14} className="text-white" />
-      </div>
-      <span className={`font-bold transition-colors ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{text}</span>
-    </div>
-  );
-}
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  const [isOpen, setIsOpen] = useState(false);
 
-function Step({ number, title, description, icon: Icon, isDark }: { number: string, title: string, description: string, icon: any, isDark: boolean }) {
   return (
-    <div className="text-center group">
-       <div className={`w-20 h-20 mx-auto rounded-[2rem] flex items-center justify-center mb-8 border transition-all ${isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-900 shadow-xl group-hover:shadow-2xl'}`}>
-          <Icon size={32} />
-       </div>
-       <div className="text-blue-600 font-black mb-2 flex items-center justify-center gap-2">
-          <span>{number}</span> <ChevronRight size={14} />
-       </div>
-       <h4 className="text-xl font-black mb-4 uppercase italic tracking-tighter">{title}</h4>
-       <p className={`font-semibold leading-relaxed transition-colors ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>{description}</p>
-    </div>
-  );
-}
-
-function Benefit({ icon: Icon, title, desc, isDark }: { icon: any, title: string, desc: string, isDark: boolean }) {
-  return (
-    <div className="flex gap-6 items-start group">
-       <div className={`p-4 rounded-2xl transition-all ${isDark ? 'bg-slate-900 text-blue-400' : 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white'}`}>
-          <Icon size={24} />
-       </div>
-       <div>
-          <h4 className="font-black text-lg uppercase italic mb-1 tracking-tighter">{title}</h4>
-          <p className={`font-bold text-sm transition-colors ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>{desc}</p>
-       </div>
+    <div className="bg-white dark:bg-zinc-900 rounded-[2rem] border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-8 py-6 text-left flex justify-between items-center gap-4 group"
+      >
+        <span className="font-bold text-lg text-slate-900 dark:text-white group-hover:text-brand-blue dark:group-hover:text-blue-400 transition-colors">{question}</span>
+        <motion.div
+          animate={{ rotate: isOpen ? 45 : 0, backgroundColor: isOpen ? '#ef4444' : '#0056b3' }}
+          className="w-8 h-8 rounded-full flex items-center justify-center text-white shrink-0 transition-colors"
+        >
+          <X size={18} className={isOpen ? "" : "rotate-45"} />
+        </motion.div>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="px-8 pb-8"
+          >
+            <div className="pt-2 border-t border-slate-100 dark:border-zinc-800">
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium pt-4">
+                {answer}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
