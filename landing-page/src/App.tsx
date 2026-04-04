@@ -1,6 +1,18 @@
 import { useState, useEffect } from 'react';
-import { Sun, Moon, Menu, X, MessageCircle, AlertTriangle, CheckCircle, Search, FileText, Send, Clock, ShieldCheck, Ban, AlertCircle, RefreshCw, ChevronRight, Car } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import {
+  Sun, Moon, Menu, X, MessageCircle, AlertTriangle, CheckCircle,
+  Search, FileText, Send, Clock, ShieldCheck, Ban, AlertCircle,
+  RefreshCw, ChevronRight, Car
+} from 'lucide-react';
+
+import {
+  FaInstagram,
+  FaFacebook,
+  FaYoutube,
+  FaTiktok
+} from 'react-icons/fa';
+
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -14,7 +26,7 @@ export default function App() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-
+  <h1>LANDING OK</h1>
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -115,8 +127,10 @@ export default function App() {
           <div className="flex justify-between h-20 items-center">
             <div className="flex-shrink-0 flex items-center">
               <a href="#" className="text-2xl font-black text-brand-blue dark:text-blue-400 tracking-tighter flex items-center gap-2">
-                <ShieldCheck size={32} />
-                <span>Multa<span className="text-slate-900 dark:text-white">Expert</span></span>
+                <img
+                  src="/logo.png"
+                  className="h-10 w-auto"
+                />
               </a>
             </div>
 
@@ -446,71 +460,99 @@ export default function App() {
       {/* Footer */}
       <footer id="contato" className="bg-slate-950 text-white pt-32 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
           <div className="grid md:grid-cols-4 gap-16 mb-24">
+
+            {/* LOGO + DESCRIÇÃO */}
             <div className="col-span-1 md:col-span-2">
-              <a href="#" className="text-3xl font-black text-blue-400 tracking-tighter mb-8 block flex items-center gap-2">
-                <ShieldCheck size={36} />
-                <span>Multa<span className="text-white">Expert</span></span>
+              <a href="#" className="mb-8 block">
+                <img
+                  src="/logo.png"
+                  alt="MultaExpert"
+                  className="h-12 w-auto"
+                />
               </a>
+
               <p className="text-slate-400 max-w-md leading-relaxed text-lg font-medium mb-10">
-                Líderes em recursos de multas e regularização de CNH. Combinamos tecnologia e conhecimento jurídico para garantir seus direitos no trânsito.
+                Especialistas em recursos de multas e regularização de CNH.
+                Atendimento rápido, direto e com alta taxa de sucesso.
               </p>
-              <div className="flex gap-4">
-                {['facebook', 'instagram', 'linkedin'].map(social => (
-                  <a key={social} href="#" className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center hover:bg-brand-blue transition-colors border border-white/10">
-                    <span className="sr-only">{social}</span>
-                    <div className="w-5 h-5 bg-slate-400 rounded-sm"></div>
-                  </a>
-                ))}
+
+              {/* REDES SOCIAIS */}
+              <div className="flex gap-4 text-2xl">
+
+                <a href="https://instagram.com/multaexpertia" target="_blank"
+                  className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center hover:bg-pink-600 transition-all border border-white/10 hover:scale-110">
+                  <FaInstagram />
+                </a>
+
+                <a href="https://tiktok.com/@multaexpert" target="_blank"
+                  className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white hover:text-black transition-all border border-white/10 hover:scale-110">
+                  <FaTiktok />
+                </a>
+
+                <a href="#"
+                  className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center hover:bg-red-600 transition-all border border-white/10 hover:scale-110">
+                  <FaYoutube />
+                </a>
+
+                <a href="#"
+                  className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center hover:bg-blue-600 transition-all border border-white/10 hover:scale-110">
+                  <FaFacebook />
+                </a>
+
               </div>
             </div>
 
+            {/* CONTATO */}
             <div>
               <h4 className="text-xl font-bold mb-8">Contato</h4>
               <ul className="space-y-6 text-slate-400 font-medium">
-                <li className="flex items-start gap-4">
-                  <MessageCircle size={24} className="text-brand-green shrink-0" />
-                  <div>
-                    <p className="text-white font-bold mb-1">WhatsApp</p>
-                    <p>(00) 00000-0000</p>
-                  </div>
+
+                <li>
+                  <p className="text-white font-bold mb-1">WhatsApp</p>
+                  <p>(48) 99100-3589</p>
                 </li>
-                <li className="flex items-start gap-4">
-                  <FileText size={24} className="text-brand-blue shrink-0" />
-                  <div>
-                    <p className="text-white font-bold mb-1">E-mail</p>
-                    <p>contato@multaexpert.com.br</p>
-                  </div>
+
+                <li>
+                  <p className="text-white font-bold mb-1">E-mail</p>
+                  <p>multaexpert01@gmail.com</p>
                 </li>
-                <li className="flex items-start gap-4">
-                  <AlertCircle size={24} className="text-slate-500 shrink-0" />
-                  <div>
-                    <p className="text-white font-bold mb-1">Endereço</p>
-                    <p>Av. Paulista, 1000 - Bela Vista<br />São Paulo - SP, 01310-100</p>
-                  </div>
+
+                <li>
+                  <p className="text-white font-bold mb-1">Endereço</p>
+                  <p>
+                    Rua José Ferreira - 101 - Sala 04<br />
+                    Tubarão - SC
+                  </p>
                 </li>
+
               </ul>
             </div>
 
+            {/* LINKS */}
             <div>
               <h4 className="text-xl font-bold mb-8">Links Rápidos</h4>
               <ul className="space-y-4 text-slate-400 font-medium">
-                <li><a href="#inicio" className="hover:text-white transition-colors flex items-center gap-2"><ChevronRight size={16} /> Início</a></li>
-                <li><a href="#como-funciona" className="hover:text-white transition-colors flex items-center gap-2"><ChevronRight size={16} /> Como Funciona</a></li>
-                <li><a href="#servicos" className="hover:text-white transition-colors flex items-center gap-2"><ChevronRight size={16} /> Serviços</a></li>
-                <li><a href="#duvidas" className="hover:text-white transition-colors flex items-center gap-2"><ChevronRight size={16} /> Dúvidas</a></li>
-                <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2"><ChevronRight size={16} /> Termos de Uso</a></li>
+                <li><a href="#inicio" className="hover:text-white">Início</a></li>
+                <li><a href="#como-funciona" className="hover:text-white">Como Funciona</a></li>
+                <li><a href="#servicos" className="hover:text-white">Serviços</a></li>
+                <li><a href="#duvidas" className="hover:text-white">Dúvidas</a></li>
               </ul>
+            </div>
+
+          </div>
+
+          {/* COPY */}
+          <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-slate-500 text-sm font-medium">
+            <p>© {new Date().getFullYear()} MultaExpert. Todos os direitos reservados.</p>
+
+            <div className="flex gap-8">
+              <a href="#" className="hover:text-white">Política de Privacidade</a>
+              <a href="#" className="hover:text-white">Termos de Uso</a>
             </div>
           </div>
 
-          <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-slate-500 text-sm font-medium">
-            <p>© {new Date().getFullYear()} MultaExpert. Todos os direitos reservados.</p>
-            <div className="flex gap-8">
-              <a href="#" className="hover:text-white transition-colors">Política de Privacidade</a>
-              <a href="#" className="hover:text-white transition-colors">Segurança</a>
-            </div>
-          </div>
         </div>
       </footer>
 
