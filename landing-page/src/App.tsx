@@ -26,7 +26,7 @@ export default function App() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  <h1>LANDING OK</h1>
+
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -147,7 +147,7 @@ export default function App() {
                   className="p-2.5 rounded-xl bg-slate-100 dark:bg-zinc-900 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-800 transition-all"
                   aria-label="Alternar tema"
                 >
-                  {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
+                  {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
                 </button>
                 <a href={whatsappLink} className="bg-brand-blue hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/20">
                   CONSULTA GRÁTIS
@@ -160,7 +160,7 @@ export default function App() {
                 onClick={() => setIsDarkMode(!isDarkMode)}
                 className="p-2 rounded-xl bg-slate-100 dark:bg-zinc-900 text-slate-600 dark:text-slate-300"
               >
-                {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
+                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
               </button>
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
