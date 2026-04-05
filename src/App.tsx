@@ -34,10 +34,10 @@ function MainApp() {
           <Route path="*" element={<Login />} />
         </Routes>
       ) : (
-        <div className="flex min-h-screen w-full bg-white dark:bg-slate-950">
+        <div className="flex h-screen w-full bg-white dark:bg-slate-950 overflow-hidden">
           <Sidebar />
 
-          <main className="flex flex-1 flex-col w-full">
+          <main className="flex-1 min-w-0 flex flex-col relative">
             <div className="h-16 lg:hidden" />
 
             <Routes>
