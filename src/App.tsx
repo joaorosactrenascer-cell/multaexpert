@@ -27,46 +27,44 @@ function MainApp() {
     );
   }
 
-  if (!user) {
-    return (
-      <Routes>
-        <Route path="*" element={<Login />} />
-      </Routes>
-    );
-  }
-
   return (
     <ThemeProvider>
-      <div className="flex min-h-screen bg-white dark:bg-slate-950">
-        <Sidebar />
+      {!user ? (
+        <Routes>
+          <Route path="*" element={<Login />} />
+        </Routes>
+      ) : (
+        <div className="flex min-h-screen w-full bg-white dark:bg-slate-950">
+          <Sidebar />
 
-        <main className="flex flex-1 flex-col">
-          <div className="h-16 lg:hidden" />
+          <main className="flex flex-1 flex-col w-full">
+            <div className="h-16 lg:hidden" />
 
-          <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/multas" element={<ConsultarMultas />} />
-            <Route path="/multas/nova" element={<NovaMulta />} />
+            <Routes>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/multas" element={<ConsultarMultas />} />
+              <Route path="/multas/nova" element={<NovaMulta />} />
 
-            <Route path="/defesa/nova" element={<NovaDefesa />} />
-            <Route path="/defesa/minhas" element={<MinhasDefesas />} />
-            <Route path="/defesas" element={<MinhasDefesas />} />
+              <Route path="/defesa/nova" element={<NovaDefesa />} />
+              <Route path="/defesa/minhas" element={<MinhasDefesas />} />
+              <Route path="/defesas" element={<MinhasDefesas />} />
 
-            <Route path="/assistente-ia" element={<AssistenteIA />} />
-            <Route path="/analise-automatica" element={<AnaliseAutomatica />} />
-            <Route path="/teste-ia" element={<TesteIA />} />
+              <Route path="/assistente-ia" element={<AssistenteIA />} />
+              <Route path="/analise-automatica" element={<AnaliseAutomatica />} />
+              <Route path="/teste-ia" element={<TesteIA />} />
 
-            <Route path="/assinatura" element={<Assinatura />} />
-            <Route path="/pagamentos" element={<Pagamentos />} />
+              <Route path="/assinatura" element={<Assinatura />} />
+              <Route path="/pagamentos" element={<Pagamentos />} />
 
-            <Route path="/perfil" element={<Perfil />} />
-            <Route path="/preferencias" element={<Preferencias />} />
+              <Route path="/perfil" element={<Perfil />} />
+              <Route path="/preferencias" element={<Preferencias />} />
 
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </main>
-      </div>
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </main>
+        </div>
+      )}
     </ThemeProvider>
   );
 }
