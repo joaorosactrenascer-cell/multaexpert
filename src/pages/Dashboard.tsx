@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -11,7 +11,9 @@ import {
   Car,
   CheckCircle2,
   Clock,
-  Scale
+  Scale,
+  AlertTriangle,
+  XCircle
 } from 'lucide-react';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend
@@ -55,6 +57,47 @@ export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { metrics, loading } = useDashboard();
+  const [casosUrgentes, setCasosUrgentes] = useState(0);
+  const [casosVencidos, setCasosVencidos] = useState(0);
+
+  // Dados mockados para cálculo de urgência (similar ao Monitoramento)
+  const mockCasos = [
+    { data_infracao: '2024-03-15' }, // Normal
+    { data_infracao: '2024-03-25' }, // Atenção
+    { data_infracao: '2024-04-01' }, // Urgente
+    { data_infracao: '2024-02-20' }, // Vencido
+  ];
+
+  // Calcular urgência baseado na data da infração
+  const calcularUrgencia = (dataInfracao?: string) => {
+    if (!dataInfracao) return 'normal';
+    
+    const dataInfracaoDate = new Date(dataInfracao);
+    const dataLimite = new Date(dataInfracaoDate.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 dias
+    const hoje = new Date();
+    const diasRestantes = Math.ceil((dataLimite.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diasRestantes < 0) return 'vencido';
+    if (diasRestantes <= 3) return 'urgente';
+    if (diasRestantes <= 10) return 'atencao';
+    return 'normal';
+  };
+
+  useEffect(() => {
+    // Calcular casos urgentes e vencidos
+    const urgentes = mockCasos.filter(caso => {
+      const urgencia = calcularUrgencia(caso.data_infracao);
+      return urgencia === 'urgente';
+    }).length;
+
+    const vencidos = mockCasos.filter(caso => {
+      const urgencia = calcularUrgencia(caso.data_infracao);
+      return urgencia === 'vencido';
+    }).length;
+
+    setCasosUrgentes(urgentes);
+    setCasosVencidos(vencidos);
+  }, []);
 
   const chartData = [
     { name: 'Pendente',    value: metrics.defesasPendentes },
@@ -134,8 +177,83 @@ export const Dashboard: React.FC = () => {
           </button>
         </header>
 
+        {/* Alertas de Urgência */}
+        {(casosUrgentes > 0 || casosVencidos > 0) && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`rounded-2xl border p-4 ${
+              casosVencidos > 0 
+                ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800' 
+                : 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800'
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <div className={`flex-shrink-0 rounded-xl p-2 ${
+                casosVencidos > 0 
+                  ? 'bg-red-100 dark:bg-red-900/30' 
+                  : 'bg-orange-100 dark:bg-orange-900/30'
+              }`}>
+                {casosVencidos > 0 ? (
+                  <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                ) : (
+                  <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                )}
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <h3 className={`font-semibold ${
+                  casosVencidos > 0 
+                    ? 'text-red-900 dark:text-red-100' 
+                    : 'text-orange-900 dark:text-orange-100'
+                }`}>
+                  {casosVencidos > 0 
+                    ? `⚠️ Você tem ${casosVencidos} caso${casosVencidos > 1 ? 's' : ''} vencido${casosVencidos > 1 ? 's' : ''}!`
+                    : `⏰ Você tem ${casosUrgentes} caso${casosUrgentes > 1 ? 's' : ''} urgente${casosUrgentes > 1 ? 's' : ''}!`
+                  }
+                </h3>
+                <p className={`text-sm mt-1 ${
+                  casosVencidos > 0 
+                    ? 'text-red-700 dark:text-red-300' 
+                    : 'text-orange-700 dark:text-orange-300'
+                }`}>
+                  {casosVencidos > 0 
+                    ? `O${casosVencidos > 1 ? 's' : ''} prazo${casosVencidos > 1 ? 's' : ''} expirou. Ação imediata necessária.`
+                    : `O${casosUrgentes > 1 ? 's' : ''} prazo${casosUrgentes > 1 ? 's' : ''} está próximo do vencimento.`
+                  }
+                </p>
+                
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <button
+                    onClick={() => navigate('/monitoramento')}
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                      casosVencidos > 0 
+                        ? 'bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-200 dark:hover:bg-red-900/50' 
+                        : 'bg-orange-100 text-orange-800 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-200 dark:hover:bg-orange-900/50'
+                    }`}
+                  >
+                    <Clock className="h-4 w-4" />
+                    Ver Monitoramento
+                  </button>
+                  
+                  {casosVencidos > 0 && (
+                    <button
+                      onClick={() => navigate('/casos/novo')}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-white text-red-800 hover:bg-red-50 dark:bg-red-950 dark:text-red-200 dark:hover:bg-red-900 transition-colors border border-red-200 dark:border-red-800"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Criar Defesa
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Metric Cards */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-6">
+          {/* Cards Originais */}
           {cards.map((card, i) => (
             <motion.div
               key={card.label}
@@ -177,6 +295,53 @@ export const Dashboard: React.FC = () => {
               )}
             </motion.div>
           ))}
+
+          {/* Cards de Urgência */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 4 * 0.07 }}
+            className="relative overflow-hidden rounded-2xl border border-orange-200 bg-orange-50 p-6 dark:border-orange-800 dark:bg-orange-900/20"
+          >
+            <div className="mb-4 inline-flex rounded-xl p-2 bg-orange-100 dark:bg-orange-900/30">
+              <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+              {loading ? null : casosUrgentes}
+            </div>
+            <div className="text-sm font-medium text-orange-700 dark:text-orange-300">
+              Casos Urgentes
+            </div>
+            <button
+              onClick={() => navigate('/monitoramento')}
+              className="mt-3 text-xs font-medium text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-200 transition-colors"
+            >
+              Ver detalhes →
+            </button>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 5 * 0.07 }}
+            className="relative overflow-hidden rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-900/20"
+          >
+            <div className="mb-4 inline-flex rounded-xl p-2 bg-red-100 dark:bg-red-900/30">
+              <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+            </div>
+            <div className="text-2xl font-bold text-red-900 dark:text-red-100">
+              {loading ? null : casosVencidos}
+            </div>
+            <div className="text-sm font-medium text-red-700 dark:text-red-300">
+              Casos Vencidos
+            </div>
+            <button
+              onClick={() => navigate('/monitoramento')}
+              className="mt-3 text-xs font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 transition-colors"
+            >
+              Ver detalhes →
+            </button>
+          </motion.div>
         </div>
 
         {/* Chart + Activity */}

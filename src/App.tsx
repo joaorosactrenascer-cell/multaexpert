@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { Sidebar } from './components/Sidebar/Sidebar';
-import { NovaDefesa } from './components/Modules/NovaDefesa';
-import { MinhasDefesas } from './components/Modules/MinhasDefesas';
+import NovaDefesa from './components/Modules/NovaDefesa';
+import MinhasDefesas from "./components/Modules/MinhasDefesas";
 import { AssistenteIA } from './components/Modules/AssistenteIA';
 import { ConsultarMultas } from './components/Modules/ConsultarMultas';
 import { NovaMulta } from './components/Modules/NovaMulta';
@@ -12,9 +12,11 @@ import { Pagamentos } from './components/Modules/Pagamentos';
 import { Perfil } from './components/Modules/Perfil';
 import { Preferencias } from './components/Modules/Preferencias';
 import { Dashboard } from './pages/Dashboard';
-import { TesteIA } from './pages/TesteIA';
 import Login from './components/Modules/Login';
 import { useAuth } from './context/AuthContext';
+import AssinarContrato from "./pages/AssinarContrato";
+import Clientes from './components/Modules/Clientes';
+import { Monitoramento } from './components/Modules/Monitoramento';
 
 function MainApp() {
   const { user, loading } = useAuth();
@@ -46,19 +48,23 @@ function MainApp() {
               <Route path="/multas" element={<ConsultarMultas />} />
               <Route path="/multas/nova" element={<NovaMulta />} />
 
+              <Route path="/casos" element={<MinhasDefesas />} />
+              <Route path="/casos/novo" element={<NovaDefesa />} />
+              <Route path="/clientes" element={<Clientes />} />
+              <Route path="/monitoramento" element={<Monitoramento />} />
+
               <Route path="/defesa/nova" element={<NovaDefesa />} />
               <Route path="/defesa/minhas" element={<MinhasDefesas />} />
-              <Route path="/defesas" element={<MinhasDefesas />} />
 
               <Route path="/assistente-ia" element={<AssistenteIA />} />
               <Route path="/analise-automatica" element={<AnaliseAutomatica />} />
-              <Route path="/teste-ia" element={<TesteIA />} />
 
               <Route path="/assinatura" element={<Assinatura />} />
               <Route path="/pagamentos" element={<Pagamentos />} />
 
               <Route path="/perfil" element={<Perfil />} />
               <Route path="/preferencias" element={<Preferencias />} />
+              <Route path="/assinar/:id" element={<AssinarContrato />} />
 
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>

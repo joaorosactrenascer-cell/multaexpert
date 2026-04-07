@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, 
-  FileText, 
+  Users,
+  Scale,
   PlusCircle, 
   History, 
   Bot, 
-  Search, 
-  FileSearch,
-  FlaskConical,
-  BarChart3, 
-  CreditCard, 
+  Activity,
   Settings, 
   User, 
   Palette,
@@ -20,7 +17,6 @@ import {
   X,
   Sun,
   Moon,
-  Scale,
   LogOut
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
@@ -40,13 +36,10 @@ export const Sidebar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const { signOut } = useAuth();
   
-  // State for collapsible groups
+  // State for collapsible groups based on current path
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-    defesas: activePage.startsWith('/defesa'),
-    multas: activePage.startsWith('/multas'),
-    consulta: false,
-    financeiro: false,
-    config: false
+    casos: activePage.startsWith('/casos'),
+    config: activePage.startsWith('/perfil') || activePage.startsWith('/preferencias')
   });
 
   const toggleGroup = (group: string) => {
@@ -78,174 +71,104 @@ export const Sidebar: React.FC = () => {
     <div className="flex h-full flex-col bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transition-colors duration-300">
       {/* Header */}
       <div className="flex h-20 items-center justify-between px-6">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNavigate('dashboard')}>
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNavigate('/dashboard')}>
           <Logo variant={collapsed ? 'icon' : 'full'} />
         </div>
       </div>
 
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto px-4 py-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
-        <div className="flex flex-col gap-6">
-          {/* Main Group */}
-          <div className="flex flex-col gap-1">
-            {!collapsed && (
-              <span className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Principal
-              </span>
-            )}
-            <SidebarItem 
-              icon={LayoutDashboard} 
-              label="Dashboard" 
-              active={activePage === '/dashboard' || activePage === '/'} 
-              collapsed={collapsed} 
-              onClick={() => handleNavigate('/dashboard')}
-            />
-            
-            <SidebarGroup 
-              icon={FileText} 
-              label="Defesas" 
-              collapsed={collapsed} 
-              isOpen={openGroups.defesas}
-              onToggle={() => toggleGroup('defesas')}
-            >
-              <SidebarItem 
-                icon={PlusCircle} 
-                label="Nova Defesa" 
-                active={activePage === '/defesa/nova'}
-                collapsed={collapsed} 
-                onClick={() => handleNavigate('/defesa/nova')}
-              />
-              <SidebarItem 
-                icon={History} 
-                label="Minhas Defesas" 
-                active={activePage === '/defesa/minhas'}
-                collapsed={collapsed} 
-                onClick={() => handleNavigate('/defesa/minhas')}
-              />
-            </SidebarGroup>
+        <div className="flex flex-col gap-2">
+          {/* Dashboard */}
+          <SidebarItem 
+            icon={LayoutDashboard} 
+            label="Dashboard" 
+            active={activePage === '/dashboard' || activePage === '/'} 
+            collapsed={collapsed} 
+            onClick={() => handleNavigate('/dashboard')}
+          />
 
-            <SidebarGroup 
-              icon={FileSearch}
-              label="Multas" 
-              collapsed={collapsed} 
-              isOpen={openGroups.multas}
-              onToggle={() => toggleGroup('multas')}
-            >
-              <SidebarItem 
-                icon={PlusCircle} 
-                label="Nova Multa" 
-                active={activePage === '/multas/nova'}
-                collapsed={collapsed} 
-                onClick={() => handleNavigate('/multas/nova')}
-              />
-              <SidebarItem 
-                icon={History} 
-                label="Minhas Multas" 
-                active={activePage === '/multas'}
-                collapsed={collapsed} 
-                onClick={() => handleNavigate('/multas')}
-              />
-            </SidebarGroup>
+          {/* Clientes */}
+          <SidebarItem 
+            icon={Users} 
+            label="Clientes" 
+            active={activePage === '/clientes'} 
+            collapsed={collapsed} 
+            onClick={() => handleNavigate('/clientes')}
+          />
 
+          {/* Casos Group */}
+          <SidebarGroup 
+            icon={Scale} 
+            label="Casos" 
+            collapsed={collapsed} 
+            isOpen={openGroups.casos}
+            onToggle={() => toggleGroup('casos')}
+          >
             <SidebarItem 
-              icon={Bot} 
-              label="Assistente IA" 
-              active={activePage === '/assistente-ia'}
+              icon={PlusCircle} 
+              label="Novo Caso" 
+              active={activePage === '/casos/novo'}
               collapsed={collapsed} 
-              badge="Beta" 
-              onClick={() => handleNavigate('/assistente-ia')}
+              onClick={() => handleNavigate('/casos/novo')}
             />
             <SidebarItem 
-              icon={FlaskConical} 
-              label="Teste da IA" 
-              active={activePage === '/teste-ia'}
+              icon={History} 
+              label="Todos os Casos" 
+              active={activePage === '/casos'}
               collapsed={collapsed} 
-              badge="Lab"
-              onClick={() => handleNavigate('/teste-ia')}
+              onClick={() => handleNavigate('/casos')}
             />
-          </div>
+          </SidebarGroup>
 
-          {/* Tools Group */}
-          <div className="flex flex-col gap-1">
-            {!collapsed && (
-              <span className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Ferramentas
-              </span>
-            )}
-            <SidebarGroup 
-              icon={BarChart3} 
-              label="Ferramentas" 
-              collapsed={collapsed} 
-              isOpen={openGroups.consulta}
-              onToggle={() => toggleGroup('consulta')}
-            >
-              <SidebarItem 
-                icon={BarChart3} 
-                label="Análise Automática" 
-                active={activePage === '/analise-automatica'}
-                collapsed={collapsed} 
-                onClick={() => handleNavigate('/analise-automatica')}
-              />
-            </SidebarGroup>
+          {/* IA */}
+          <SidebarItem 
+            icon={Bot} 
+            label="Inteligência IA" 
+            active={activePage === '/assistente-ia'}
+            collapsed={collapsed} 
+            onClick={() => handleNavigate('/assistente-ia')}
+          />
 
-            <SidebarGroup 
-              icon={CreditCard} 
-              label="Financeiro" 
-              collapsed={collapsed} 
-              isOpen={openGroups.financeiro}
-              onToggle={() => toggleGroup('financeiro')}
-            >
-              <SidebarItem 
-                icon={CreditCard} 
-                label="Assinatura" 
-                active={activePage === '/assinatura'}
-                collapsed={collapsed} 
-                onClick={() => handleNavigate('/assinatura')}
-              />
-              <SidebarItem 
-                icon={History} 
-                label="Pagamentos" 
-                active={activePage === '/pagamentos'}
-                collapsed={collapsed} 
-                onClick={() => handleNavigate('/pagamentos')}
-              />
-            </SidebarGroup>
-          </div>
+          {/* Monitoramento */}
+          <SidebarItem 
+            icon={Activity} 
+            label="Monitoramento" 
+            active={activePage === '/monitoramento'} 
+            collapsed={collapsed} 
+            onClick={() => handleNavigate('/monitoramento')}
+          />
 
-          {/* System Group */}
-          <div className="flex flex-col gap-1">
-            {!collapsed && (
-              <span className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                Sistema
-              </span>
-            )}
-            <SidebarGroup 
-              icon={Settings} 
-              label="Configurações" 
+          {/* Spacer */}
+          <div className="my-4 border-t border-slate-100 dark:border-slate-900" />
+
+          {/* Configurações Group */}
+          <SidebarGroup 
+            icon={Settings} 
+            label="Configurações" 
+            collapsed={collapsed} 
+            isOpen={openGroups.config}
+            onToggle={() => toggleGroup('config')}
+          >
+            <SidebarItem 
+              icon={User} 
+              label="Meu Perfil" 
+              active={activePage === '/perfil'}
               collapsed={collapsed} 
-              isOpen={openGroups.config}
-              onToggle={() => toggleGroup('config')}
-            >
-              <SidebarItem 
-                icon={User} 
-                label="Perfil" 
-                active={activePage === '/perfil'}
-                collapsed={collapsed} 
-                onClick={() => handleNavigate('/perfil')}
-              />
-              <SidebarItem 
-                icon={Palette} 
-                label="Preferências" 
-                active={activePage === '/preferencias'}
-                collapsed={collapsed} 
-                onClick={() => handleNavigate('/preferencias')}
-              />
-            </SidebarGroup>
-          </div>
+              onClick={() => handleNavigate('/perfil')}
+            />
+            <SidebarItem 
+              icon={Palette} 
+              label="Preferências" 
+              active={activePage === '/preferencias'}
+              collapsed={collapsed} 
+              onClick={() => handleNavigate('/preferencias')}
+            />
+          </SidebarGroup>
         </div>
       </div>
 
-      {/* Footer */}
+      {/* Footer Actions */}
       <div className="mt-auto border-t border-slate-200 dark:border-slate-800 p-4">
         <div className="flex flex-col gap-2">
           {/* Theme Toggle */}
@@ -276,7 +199,7 @@ export const Sidebar: React.FC = () => {
             {!collapsed && <span className="text-sm font-medium">Recolher</span>}
           </button>
 
-          {/* Logout Toggle */}
+          {/* Logout */}
           <button
             onClick={async () => {
               await signOut();
@@ -309,7 +232,7 @@ export const Sidebar: React.FC = () => {
         </button>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer Overlay & Content */}
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -341,7 +264,7 @@ export const Sidebar: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar Container */}
       <motion.aside
         initial={false}
         animate={collapsed ? "collapsed" : "expanded"}
