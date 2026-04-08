@@ -4,13 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import {
   PlusCircle, AlertCircle, CheckCircle2, ArrowRight, User, Car, Brain,
   ShieldCheck, AlertTriangle, XCircle, FileText, RotateCcw,
-  MessageSquare, Copy, Check, ExternalLink, Users, X
+  MessageSquare, Copy, Check, ExternalLink, Cpu, Users, Search, Plus, X
 } from 'lucide-react';
 
 import { cn } from '@/src/lib/utils';
 import { useAuth } from '@/src/context/AuthContext';
 import { supabase } from '@/src/lib/supabase';
-
 import {
   getEstrategiaPrompt,
   getEstrategiaPadrao,
@@ -23,10 +22,14 @@ interface Cliente {
   nome: string;
   cpf: string;
   telefone?: string;
+  email?: string;
+  endereco?: string;
   created_at: string;
 }
 
 type Decision = 'Recorrer' | 'Analisar Melhor' | 'Não Recorrer';
+type Priority = 'alta' | 'media' | 'baixa';
+type CaseStatus = 'novo' | 'analise_concluida' | 'defesa_gerada' | 'enviado' | 'finalizado';
 
 interface AnalysisResult {
   decision: Decision;
@@ -37,11 +40,8 @@ interface AnalysisResult {
 }
 
 export default function NovaDefesa() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
 
   const [step, setStep] = useState(1);
-
   const [formData, setFormData] = useState({
     dadosMulta: '',
     nomeCliente: '',
@@ -53,21 +53,18 @@ export default function NovaDefesa() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [showWhatsappModal, setShowWhatsappModal] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
-
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [showClienteModal, setShowClienteModal] = useState(false);
+
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchClientes();
   }, []);
 
   const fetchClientes = async () => {
-    // (mantive mock por enquanto — depois migramos pro banco)
-    setClientes([
-      { id: '1', nome: 'João Silva', cpf: '123', telefone: '9999', created_at: new Date().toISOString() }
-    ]);
+    // mock por enquanto (depois ligamos no banco)
+    setClientes([]);
   };
 
   const handleInputChange = (e: any) => {
@@ -77,7 +74,10 @@ export default function NovaDefesa() {
       const [parent, child] = name.split('.');
       setFormData((prev: any) => ({
         ...prev,
-        [parent]: { ...prev[parent], [child]: value }
+        [parent]: {
+          ...prev[parent],
+          [child]: value
+        }
       }));
     } else {
       setFormData((prev: any) => ({
@@ -87,43 +87,26 @@ export default function NovaDefesa() {
     }
   };
 
-  const handleSelectCliente = (cliente: Cliente) => {
-    setFormData(prev => ({
-      ...prev,
-      cliente_id: cliente.id,
-      nomeCliente: cliente.nome
-    }));
-  };
-
   const realizarAnaliseReal = async () => {
     setIsAnalyzing(true);
 
-    await new Promise(r => setTimeout(r, 2000));
+    setTimeout(() => {
+      setAnalysisResult({
+        decision: 'Recorrer',
+        probability: '85%',
+        errors: [
+          "Falta de descrição detalhada da infração",
+          "Equipamento medidor não aferido corretamente"
+        ],
+        technicalRecommendation: "Auto com indícios de nulidade. Recomenda-se recurso.",
+        commercialHint: "Alta chance de conversão."
+      });
 
-    setAnalysisResult({
-      decision: 'Recorrer',
-      probability: '85%',
-      errors: ['Erro formal identificado'],
-      technicalRecommendation: 'Recurso recomendado.',
-      commercialHint: 'Alta conversão.'
-    });
-
-    setStep(2);
-    setIsAnalyzing(false);
+      setStep(2);
+      setIsAnalyzing(false);
+    }, 2000);
   };
 
-  const generateWhatsAppMessage = () => {
-    if (!analysisResult) return '';
-    return gerarMensagemWhatsApp(analysisResult, formData.nomeCliente);
-  };
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(generateWhatsAppMessage());
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
-  };
-
-  // 🔥🔥🔥 FUNÇÃO CORRIGIDA (SUPABASE REAL)
   const saveCase = async () => {
     if (!analysisResult) return;
 
@@ -135,7 +118,6 @@ export default function NovaDefesa() {
     setIsSaving(true);
 
     try {
-      // 🔐 usuário
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
@@ -143,14 +125,12 @@ export default function NovaDefesa() {
         return;
       }
 
-      // 🔐 tenant
       const { data: profile } = await supabase
         .from("profiles")
         .select("tenant_id")
         .eq("id", user.id)
         .single();
 
-      // 🚀 insert
       const { error } = await supabase
         .from("multas")
         .insert({
@@ -160,16 +140,16 @@ export default function NovaDefesa() {
           descricao: formData.dadosMulta,
           placa: formData.placa || "ABC1234",
           status: "nova",
-          data_infracao: new Date().toISOString().split("T")[0]
+          data_infracao: new Date().toISOString().split("T")[0],
         });
 
       if (error) throw error;
 
-      alert("Caso salvo 🚀");
+      alert("Salvo com sucesso 🚀");
       navigate('/casos');
 
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       alert("Erro ao salvar");
     } finally {
       setIsSaving(false);
@@ -178,41 +158,52 @@ export default function NovaDefesa() {
 
   return (
     <div className="p-6">
-      <h1 className="text-xl font-bold">Nova Defesa</h1>
 
       {step === 1 && (
-        <>
+        <div className="space-y-4">
+
           <textarea
             name="dadosMulta"
             value={formData.dadosMulta}
             onChange={handleInputChange}
-            className="w-full border p-3 mt-4"
-            placeholder="Texto da multa"
+            placeholder="Cole a multa aqui"
+            className="w-full p-4 border rounded"
           />
 
           <input
             name="nomeCliente"
             value={formData.nomeCliente}
             onChange={handleInputChange}
-            className="w-full border p-3 mt-4"
             placeholder="Nome do cliente"
+            className="w-full p-4 border rounded"
           />
 
-          <button onClick={realizarAnaliseReal} className="mt-4 bg-blue-600 text-white px-4 py-2">
+          <button
+            onClick={realizarAnaliseReal}
+            className="bg-blue-600 text-white px-6 py-3 rounded"
+          >
             Analisar
           </button>
-        </>
+
+        </div>
       )}
 
       {step === 2 && analysisResult && (
-        <>
-          <p className="mt-4">Resultado: {analysisResult.decision}</p>
+        <div className="space-y-4">
 
-          <button onClick={saveCase} className="mt-4 bg-green-600 text-white px-4 py-2">
-            Salvar Caso
+          <h2>Resultado: {analysisResult.decision}</h2>
+
+          <button
+            onClick={saveCase}
+            disabled={isSaving}
+            className="bg-green-600 text-white px-6 py-3 rounded"
+          >
+            {isSaving ? 'Salvando...' : 'Salvar'}
           </button>
-        </>
+
+        </div>
       )}
+
     </div>
   );
 }
